@@ -1,4 +1,5 @@
 from textnode import TextNode, text_type_bold, text_type_text
+from htmlnode import HTMLNode
 
 def main():
     # TextNode.py start
@@ -11,5 +12,11 @@ def main():
     print(textnode2.__repr__())
 
     #TextNode.py end
-
+    #HTMLNode.py start
+    htmlnode = HTMLNode(tag = "tag", value = "value", children = "children", props = {"href": "https://", "alt": "props"})
+    
+    print("---htmlnode.py---")
+    print(htmlnode.__repr__())
+    print(htmlnode.props_to_html())
+    #HTMLNode.py end
 main()
