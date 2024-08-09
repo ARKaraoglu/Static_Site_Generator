@@ -8,7 +8,7 @@ class HTMLNode():
         self.props = props
     
     def to_html(self):
-        raise NotImplementedError("This method has not been implemented")
+        raise NotImplementedError("to_html method not implemented")
 
     def props_to_html(self):
         assert self.props is not None
