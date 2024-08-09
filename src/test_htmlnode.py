@@ -4,7 +4,9 @@ from htmlnode import HTMLNode
 class TestHTMLNode(unittest.TestCase):
     def test_to_html(self):
         node = HTMLNode(tag = "tag", value = "value", children = "children", props = {"href": "https://", "alt": "props"})
-    
+        with self.assertRaises(NotImplementedError):
+            node.to_html()
+
     def test_props_to_html(self):
         node = HTMLNode(tag = "tag", value = "value", children = "children", props = {"href": "https://", "alt": "props"})
         self.assertEqual(node.props_to_html(), ' href="https://" alt="props"')
