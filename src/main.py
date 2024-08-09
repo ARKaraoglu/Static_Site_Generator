@@ -1,5 +1,6 @@
 from textnode import TextNode, text_type_bold, text_type_text
 from htmlnode import HTMLNode
+from leafnode import LeafNode
 
 def main():
     # TextNode.py start
@@ -19,4 +20,12 @@ def main():
     print(htmlnode.__repr__())
     print(htmlnode.props_to_html())
     #HTMLNode.py end
+   
+    #leafnode.py start
+    leafnode = LeafNode(tag = "p", value = "this is a leafnode", props = {"href": "/"})
+    
+    print("---leafnode.py---")
+    print(leafnode.to_html())
+    #leafnode.py end
+
 main()
