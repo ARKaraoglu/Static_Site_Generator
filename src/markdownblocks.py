@@ -1,6 +1,6 @@
 from enum import Enum
 from htmlnode import HTMLNode, LeafNode, ParentNode
-from splitdelimiter import text_type_delimiters, split_nodes_delimiter
+from splitdelimiter import split_nodes_image, split_nodes_link, text_type_delimiters, split_nodes_delimiter
 from textnode import TextType, TextNode
 import re
 
@@ -103,8 +103,11 @@ def block_to_block_types(block):
 #   Bold
 #   link
 #   image
-# TODO: Creating the Parent Heading HTMLNode
+# WARNING: Returns a parent html node with header tag and all headings are in children. Requires further testing.
+# NOTE: Returns HTMLNode with tag = header and children = [all heading HTMLNodes with tags as h1...h6 with children that contains all textnodes: text,bold,italic,code,link,image]
+# WARNING: Link and Image testing not complete yet!
 def markdown_to_html_node_heading(block):
+    parentHeaderNode = HTMLNode(tag = "header", value = None, children = None, props = None)
     headings = block.split("\n")
     
     splitHeadings = []
@@ -112,23 +115,22 @@ def markdown_to_html_node_heading(block):
         splitHeadings.append(heading.split(" ", 1))
     print(splitHeadings)
     
-    headingList = []
+    childrenHeaderNodes = []
     for heading in splitHeadings:
-        symbol = f"h{heading[0].count('#')}"
+        tag = f"h{heading[0].count('#')}"
         text = heading[1]
+        header = HTMLNode(tag = tag)
         # textNode = TextNode(heading[1], TextType.TEXT)
         
-        splitNodeList = []
-        splitNodeList.extend(text_to_children(text))
+        childrenNodesList = []
+        childrenNodesList.extend(text_to_children(text))
         
-        # if len(textList) > 0:
-        #     bufferList = []
-        #     for text in textList:
-        #         if text_type_delimiter[TextType.ITALIC] in text:
-        #             bufferList.extend()
-        # print(splitNodeList)
-        headingList.append(splitNodeList)
-    
+        header.children = childrenNodesList
+        childrenHeaderNodes.append(header)
+        
+
+    parentHeaderNode.children = childrenHeaderNodes
+    print(parentHeaderNode)
         
 
 
@@ -151,8 +153,7 @@ def markdown_to_html_node_code(block):
 def markdown_to_html_node_quote(block):
     pass
 
-# TODO: Image Check
-# TODO: Link Check
+# NOTE: Completed. Testing required!
 def text_to_children(text):
     nodeList = []
     imageRegex = r"!\[.*?\]\(.*?\)"
@@ -172,10 +173,12 @@ def text_to_children(text):
                 bufferList.extend(split_nodes_delimiter([node], text_type_delimiters[TextType.ITALIC], TextType.ITALIC))
             elif text_type_delimiters[TextType.CODE] in node.text:
                 bufferList.extend(split_nodes_delimiter([node], text_type_delimiters[TextType.CODE], TextType.CODE))
-            elif re.match(imageRegex, node.text):
-                pass
-            elif re.match(linkRegex, node.text):
-                pass
+            elif re.search(imageRegex, node.text):
+                print("Image Regex activated")
+                bufferList.extend(split_nodes_image(node))
+            elif re.search(linkRegex, node.text):
+                print("Link Regex activated")
+                bufferList.extend(split_nodes_link(node))
             else:
                 bufferList.append(node)
         if len(bufferList) == len(nodeList):
@@ -183,7 +186,7 @@ def text_to_children(text):
         else:
             nodeList.clear()
             nodeList.extend(bufferList)
-
+    print(f"\n{nodeList}\n")
     return nodeList
 
 # TODO: Handling every Block types
@@ -222,7 +225,9 @@ def markdown_to_html_node(text):
 
 
 md = """
-# This is a heading with a *italic* text and a **bold** text
+# This is a heading with a *italic* text and a **bold** text.
+### this is an h3 heading with `code` text and a **bold text** in it.
+##### this is an ![image alt](/) and a [link alt](//).
 """
 
 markdown_to_html_node(md)
