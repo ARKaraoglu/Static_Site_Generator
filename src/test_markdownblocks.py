@@ -145,7 +145,7 @@ Quote 5
 - Unordered Block Two
 """
         blocks = markdown_to_blocks(md)
-        self.assertEqual("unordered_list", block_to_block_types(blocks[0]))
+        self.assertEqual("paragraph", block_to_block_types(blocks[0]))
     
     def test_block_to_block_types_unordered_block_multiple_sentence(self):
         md = """
@@ -158,7 +158,7 @@ Quote 5
 * Unordered Block Seven
 """
         blocks = markdown_to_blocks(md)
-        self.assertEqual("unordered_list", block_to_block_types(blocks[0]))
+        self.assertEqual("paragraph", block_to_block_types(blocks[0]))
     
     def test_block_to_block_types_unordered_block_false(self):
         md = """

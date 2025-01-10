@@ -54,7 +54,7 @@ def block_to_block_types(block):
         else:
             return MarkdownTypes.PARAGRAPH.value
 
-    #Checking Quote Block
+    # Checking Quote Block
     if ">" in words[0][0]:
         quoteBlock = False
         for group in words:
@@ -64,18 +64,31 @@ def block_to_block_types(block):
                 return MarkdownTypes.PARAGRAPH.value
         if quoteBlock == True:
             return MarkdownTypes.QUOTE.value
+    
+    # Checking Unordered List Block
+    if words[0][0].startswith("- "):
+        for word in words:
+            if not word.startswith("- "):
+                return MarkdownTypes.PARAGRAPH
+        return MarkdownTypes.UNORDERED_LIST
 
-    if "*" in words[0][0] or "-" in words[0][0]:
-        for x in range(0, len(lines)):
-            if words[x][0] == "*":
-                continue
-            elif words[x][0] == "-":
-                continue
-            else:
-                return MarkdownTypes.PARAGRAPH.value
-        return MarkdownTypes.UNORDERED_LIST.value
+    if words[0][0].startswith("* "):
+        for word in words:
+            if not word.startswith("* "):
+                return MarkdownTypes.PARAGRAPH
+        return MarkdownTypes.UNORDERED_LIST
 
+    # if "*" in words[0][0] or "-" in words[0][0]:
+    #     for x in range(0, len(lines)):
+    #         if words[x][0] == "*":
+    #             continue
+    #         elif words[x][0] == "-":
+    #             continue
+    #         else:
+    #             return MarkdownTypes.PARAGRAPH.value
+    #     return MarkdownTypes.UNORDERED_LIST.value
 
+    # Checking Ordered List Block
     if "1." in words[0][0]:
         lineNumber = 1
         for x in range(0, len(lines)):
@@ -103,11 +116,10 @@ def block_to_block_types(block):
 #   Bold
 #   link
 #   image
-# WARNING: Returns a parent html node with header tag and all headings are in children. Requires further testing.
+# NOTE: Returns a parent html node with header tag and all headings are in children. Requires further testing.
 # NOTE: Returns HTMLNode with tag = header and children = [all heading HTMLNodes with tags as h1...h6 with children that contains all textnodes: text,bold,italic,code,link,image]
-# WARNING: Link and Image testing not complete yet!
 def markdown_to_html_node_heading(block):
-    parentHeaderNode = HTMLNode(tag = "header", value = None, children = None, props = None)
+    parentHeaderNode = HTMLNode(tag = MarkdownTypes.HEADING, value = None, children = None, props = None)
     headings = block.split("\n")
     
     splitHeadings = []
@@ -134,14 +146,21 @@ def markdown_to_html_node_heading(block):
         
 
 
-# TODO: Paragraph Handling
 # TODO: UnOrdered List Handling
 # TODO: Ordered List Handling
 # TODO: Quote Handling
 def markdown_to_html_node_paragraph(block):
-    pass
+    parentParagraphNode = HTMLNode(tag = MarkdownTypes.PARAGRAPH, value = None, children = None, props = None)
+
+    childParagraphNodes = []
+    paragraphNode = HTMLNode("p", value = None, children = text_to_children(block), props = None)
+    childParagraphNodes.append(paragraphNode)
+    parentParagraphNode.children = childParagraphNodes
+    print(parentParagraphNode)
+
 def markdown_to_html_node_unordered_list(block):
-    pass
+    lines = block.split("\n")
+
 def markdown_to_html_node_ordered_list(block):
     pass
 def markdown_to_html_node_link(links):
@@ -228,6 +247,8 @@ md = """
 # This is a heading with a *italic* text and a **bold** text.
 ### this is an h3 heading with `code` text and a **bold text** in it.
 ##### this is an ![image alt](/) and a [link alt](//).
+
+this is a paragraph
 """
 
 markdown_to_html_node(md)
