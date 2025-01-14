@@ -1,6 +1,5 @@
 import unittest
-from markdownblocks import  markdown_to_blocks, block_to_block_types
-
+from markdownblocks import *
 
 class TestMarkdownToHTML(unittest.TestCase):
 
@@ -259,8 +258,37 @@ this is a paragraph
         for block in blocks:
             self.assertEqual("paragraph", block_to_block_types(block))
 
+# Markdown to html nodes tests
 
+    # Heading
+    def test_markdown_to_html_node_heading(self):
+        pass
 
+    def test_markdown_to_html_node_heading_two(self):
+        pass
+    def test_markdown_to_html_node_heading_three(self):
+        pass
+    
+    def test_markdown_to_html_node_paragraph(self):
+        pass
+    
+    def test_markdown_to_html_node_unordered_list(self):
+        pass
+    
+    def test_markdown_to_html_node_ordered_list(self):
+        pass
+    
+    def test_markdown_to_html_node_quote(self):
+        pass
+    
+    def test_markdown_to_html_node_code(self):
+        pass
+
+    def test_markdown_to_html_node_text_to_children(self):
+        pass
+
+    def test_markdown_to_html_node(self):
+        pass
 
 
 
