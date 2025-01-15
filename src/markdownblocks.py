@@ -150,11 +150,13 @@ def markdown_to_html_node_heading(block):
 
 def markdown_to_html_node_paragraph(block):
     print("PARAGRAPH START\n")
+    lines = block.split("\n")
     parentParagraphNode = HTMLNode(tag = MarkdownTypes.PARAGRAPH, value = None, children = None, props = None)
 
     childParagraphNodes = []
-    paragraphNode = HTMLNode("p", value = None, children = text_to_children(block), props = None)
-    childParagraphNodes.append(paragraphNode)
+    for line in lines:
+        paragraphNode = HTMLNode("p", value = None, children = text_to_children(line), props = None)
+        childParagraphNodes.append(paragraphNode)
     parentParagraphNode.children = childParagraphNodes
     print(parentParagraphNode)
     print("PARAGRAPH END\n")
@@ -380,28 +382,28 @@ def markdown_to_html_node(text):
 # 3. ordered *italic* list 3
 # 4. ordered `code` list 4
 # """
-md = """
-![Image text](/)
-![image two](/)
-![image three](/)
-
-[link one](/)
-[link two](#)
-[link three](#)
-
-```
-{
-  "firstName": "John",
-  "lastName": "Smith",
-  "age": 25
-}
-```
-
-
-
-
-
-"""
-
-
-markdown_to_html_node(md)
+# md = """
+# ![Image text](/)
+# ![image two](/)
+# ![image three](/)
+#
+# [link one](/)
+# [link two](#)
+# [link three](#)
+#
+# ```
+# {
+#   "firstName": "John",
+#   "lastName": "Smith",
+#   "age": 25
+# }
+# ```
+#
+#
+#
+#
+#
+# """
+#
+#
+# markdown_to_html_node(md)
