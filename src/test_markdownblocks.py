@@ -332,13 +332,142 @@ This is `code` with **bold** and *italic* text.
         self.assertEqual(p2.children[1].tag, "code", "Should be code")
     
     def test_markdown_to_html_node_unordered_list(self):
-        pass
-    
+        md = """
+- Unordered 1
+- Unordered 2 with **bold**
+- Unordered 3 with *italic*
+- Unordered 4 with  `code`
+- Unordered 5
+- Unordered 6
+-
+- Unordered 7
+"""
+
+        md2 = """
+* Unordered 1
+* Unordered 2 with **bold**
+* Unordered 3 with *italic*
+* Unordered 4 with  `code`
+* Unordered 5
+* Unordered 6
+*
+* Unordered 7
+"""
+        parentNode = markdown_to_html_node(md)
+        parentNode2 = markdown_to_html_node(md2)
+        
+        assert parentNode.children is not None
+        assert parentNode2.children is not None
+        
+        unorderedListParent = parentNode.children[0]
+        unorderedListParent2 = parentNode2.children[0]
+        
+        ulNode = unorderedListParent.children
+        ulNode2 = unorderedListParent2.children
+
+        listItems = ulNode.children
+        listItems2 = ulNode2.children
+        
+        # Validate UL
+        self.assertEqual(ulNode.tag, "ul", "should be ul")
+        self.assertEqual(ulNode2.tag, "ul", "should be ul")
+        
+        # Validate List Items
+        self.assertEqual(len(listItems), 8, "8 sentences = 8 children")
+        self.assertEqual(len(listItems2), 8, "8 sentences = 8 children")
+        
+        self.assertEqual(len(listItems[0].children), 1, "Should be 1 since no inline markdown")
+        self.assertEqual(len(listItems2[0].children), 1, "Should be 1 since no inline markdown")
+        
+        self.assertEqual(listItems[0].tag, "li", "Should be li")
+        self.assertEqual(listItems2[0].tag, "li", "Should be li")
+
+        self.assertEqual(len(listItems[1].children), 2, "Should be 2")
+        self.assertEqual(len(listItems[2].children), 2, "Should be 2")
+        self.assertEqual(len(listItems[3].children), 2, "Should be 2")
+        self.assertEqual(len(listItems[4].children), 1, "Should be 1 since no inline markdown")
+        self.assertEqual(len(listItems[5].children), 1, "Should be 1 since no inline markdown")
+        self.assertEqual(len(listItems[6].children), 1, "Should be 1 since no inline markdown")
+        self.assertEqual(len(listItems[7].children), 1, "Should be 1 since no inline markdown")
+
+        self.assertEqual(len(listItems2[1].children), 2, "Should be 2")
+        self.assertEqual(len(listItems2[2].children), 2, "Should be 2")
+        self.assertEqual(len(listItems2[3].children), 2, "Should be 2")
+        self.assertEqual(len(listItems2[4].children), 1, "Should be 1 since no inline markdown")
+        self.assertEqual(len(listItems2[5].children), 1, "Should be 1 since no inline markdown")
+        self.assertEqual(len(listItems2[6].children), 1, "Should be 1 since no inline markdown")
+        self.assertEqual(len(listItems2[7].children), 1, "Should be 1 since no inline markdown")
     def test_markdown_to_html_node_ordered_list(self):
-        pass
+        md = """
+1. Ordered list 1
+2. Ordered list 2
+3. ordered list **bold** **bold** **bold**3
+4.
+5.
+6.
+7.
+
+"""
+        parentNode = markdown_to_html_node(md)
+        
+        assert parentNode.children is not None
+        orderedListNode = parentNode.children[0]
+        olNode = orderedListNode.children
+        listItems = olNode.children
+        
+        # Validating olNode
+        self.assertEqual(olNode.tag, "ol", "should be ol")
+        self.assertEqual(len(olNode.children), 7, "should be 7")
+
+        # Validating List Items
+        self.assertEqual(len(listItems[0].children), 1, "Should be 1")
+        self.assertEqual(listItems[0].children[0].value, "Ordered list 1", "Should be the sentence itself")
+        
+        self.assertEqual(len(listItems[1].children), 1, "Should be 1")
+        self.assertEqual(listItems[1].children[0].value, "Ordered list 2", "Should be the sentence itself")
+
+        self.assertEqual(len(listItems[2].children), 5, "Should be 5")
+        self.assertEqual(listItems[2].children[1].value, "bold", "Should be bold")
+        self.assertEqual(listItems[2].children[2].value, "bold", "Should be bold")
+        self.assertEqual(listItems[2].children[3].value, "bold", "Should be bold")
+        self.assertEqual(listItems[2].children[4].value, "3", "Should be 3")
+
+        self.assertEqual(len(listItems[3].children), 1, "Should be 1")
+        self.assertEqual(listItems[3].children[0].value, " ", "Should be an empty string")
+
+        self.assertEqual(len(listItems[4].children), 1, "Should be 1")
+        self.assertEqual(listItems[4].children[0].value, " ", "Should be an empty string")
+
+
+        self.assertEqual(len(listItems[5].children), 1, "Should be 1")
+        self.assertEqual(listItems[5].children[0].value, " ", "Should be an empty string")
+        
+        self.assertEqual(len(listItems[6].children), 1, "Should be 1")
+        self.assertEqual(listItems[6].children[0].value, " ", "Should be an empty string")
     
     def test_markdown_to_html_node_quote(self):
-        pass
+        md = """
+> Quote 1
+> Quote 2
+> Quote 3 with **bold** and *italic* text.
+> Quote 4 has `code` in it.
+>
+> Quote 5
+>
+"""
+        parentNode = markdown_to_html_node(md)
+        assert parentNode.children is not None
+        quoteParentNode = parentNode.children[0]
+        
+        quoteNode = quoteParentNode.children
+        quoteChildren = quoteNode.children
+        
+        # Validating Quote Items
+        self.assertEqual(len(quoteChildren), 7, "Should be 7")
+
+        self.assertEqual(len(quoteChildren[2].children), 5, "Should be 5")
+        self.assertEqual(quoteChildren[4].children[0].value, " ", "Should be empty string")
+
     
     def test_markdown_to_html_node_code(self):
         pass

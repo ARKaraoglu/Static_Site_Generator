@@ -125,6 +125,8 @@ def markdown_to_html_node_heading(block):
     
     splitHeadings = []
     for heading in headings:
+        if len(heading) == 1:
+            raise ValueError("Heading cannot be empty")
         splitHeadings.append(heading.split(" ", 1))
     print(splitHeadings)
     
@@ -171,7 +173,12 @@ def markdown_to_html_node_unordered_list(block):
     unorderedListParentNode = HTMLNode(tag = MarkdownTypes.UNORDERED_LIST)
 
     for line in lines:
-        text = line.split(" ", 1)[1]
+        text = ""
+        print(f"line:{line}")
+        if len(line) == 1:
+            text = " "
+        else:
+            text = line.split(" ", 1)[1]
         print(text)
         nodeChildren = text_to_children(text)
         node = HTMLNode(tag = "li", value = None, children = nodeChildren, props = None)
@@ -192,8 +199,15 @@ def markdown_to_html_node_ordered_list(block):
     listItemNodes = []
     orderedListParentNode = HTMLNode(tag = MarkdownTypes.ORDERED_LIST)
 
+    print("here")
     for line in lines:
-        text = line.split(" ", 1)[1]
+        text = ""
+        print("here")
+        print(f"line:{line}")
+        if len(line) == 2:
+            text = " "
+        else:
+            text = line.split(" ", 1)[1]
         nodeChildren = text_to_children(text)
         node = HTMLNode(tag = "li", value = None, children = nodeChildren, props = None)
         listItemNodes.append(node)
@@ -213,9 +227,14 @@ def markdown_to_html_node_quote(block):
     
     childrenList = []
     for line in lines:
-        text = line.split(" ", 1)[1]
+        text = ""
+        print(f"line:{line}")
+        if len(line) == 1:
+            text = " "
+        else:
+            text = line.split(" ", 1)[1]
         children = text_to_children(text)
-        quoteLine = HTMLNode(tag = MarkdownTypes.QUOTE, value = None, children = children, props = None)
+        quoteLine = HTMLNode(tag = "p", value = None, children = children, props = None)
         childrenList.append(quoteLine)
 
     quoteBlockNodeList = HTMLNode(tag = "quoteblock", value = None, children = childrenList, props = None)
@@ -406,4 +425,14 @@ def markdown_to_html_node(text):
 # """
 #
 #
-# markdown_to_html_node(md)
+md = """
+- Unordered 1
+- Unordered 2 with **bold**
+- Unordered 3 with *italic*
+- Unordered 4 with  `code`
+- Unordered 5
+- Unordered 6
+-
+- Unordered 7
+"""
+print(markdown_to_html_node(md))
