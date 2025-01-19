@@ -120,7 +120,6 @@ def block_to_block_types(block):
 # NOTE: Returns HTMLNode with tag = header and children = [all heading HTMLNodes with tags as h1...h6 with children that contains all textnodes: text,bold,italic,code,link,image]
 def markdown_to_html_node_heading(block):
     # print("HEADING START\n")
-    parentHeaderNode = HTMLNode(tag = MarkdownTypes.HEADING, value = None, children = None, props = None)
     headings = block.split("\n")
     
     splitHeadings = []
@@ -142,8 +141,8 @@ def markdown_to_html_node_heading(block):
         header.children = childrenNodesList
         childrenHeaderNodes.append(header)
         
+    parentHeaderNode = ParentNode(tag = MarkdownTypes.HEADING,  children = childrenHeaderNodes, props = None)
 
-    parentHeaderNode.children = childrenHeaderNodes
     # print(parentHeaderNode)
     # print("HEADING END\n")
 
@@ -152,13 +151,13 @@ def markdown_to_html_node_heading(block):
 def markdown_to_html_node_paragraph(block):
     # print("PARAGRAPH START\n")
     lines = block.split("\n")
-    parentParagraphNode = HTMLNode(tag = MarkdownTypes.PARAGRAPH, value = None, children = None, props = None)
 
     childParagraphNodes = []
     for line in lines:
         paragraphNode = HTMLNode("p", value = None, children = text_to_children(line), props = None)
         childParagraphNodes.append(paragraphNode)
-    parentParagraphNode.children = childParagraphNodes
+    
+    parentParagraphNode = ParentNode(tag = MarkdownTypes.PARAGRAPH,  children = childParagraphNodes, props = None)
     # print(parentParagraphNode)
     # print("PARAGRAPH END\n")
 
@@ -168,7 +167,6 @@ def markdown_to_html_node_unordered_list(block):
     # print("UNORDERED LIST START\n")
     lines = block.split("\n")
     listItemNodes = []
-    unorderedListParentNode = HTMLNode(tag = MarkdownTypes.UNORDERED_LIST)
 
     for line in lines:
         text = ""
@@ -183,7 +181,7 @@ def markdown_to_html_node_unordered_list(block):
         listItemNodes.append(node)
 
     unorderedList = HTMLNode(tag = "ul", value = None, children = listItemNodes, props = None)
-    unorderedListParentNode.children = unorderedList
+    unorderedListParentNode = ParentNode(tag = MarkdownTypes.UNORDERED_LIST, children = unorderedList)
     # print(unorderedListParentNode)
     # print("UNORDERED LIST END\n")
 
@@ -194,7 +192,6 @@ def markdown_to_html_node_ordered_list(block):
     # print("ORDERED LIST START\n")
     lines = block.split("\n")
     listItemNodes = []
-    orderedListParentNode = HTMLNode(tag = MarkdownTypes.ORDERED_LIST)
 
     for line in lines:
         text = ""
@@ -208,7 +205,7 @@ def markdown_to_html_node_ordered_list(block):
         listItemNodes.append(node)
 
     orderedList = HTMLNode(tag = "ol", value = None, children = listItemNodes, props = None)
-    orderedListParentNode.children = orderedList
+    orderedListParentNode = HTMLNode(tag = MarkdownTypes.ORDERED_LIST, children = orderedList)
     # print(orderedListParentNode)
     # print("ORDERED LIST END\n")
 
@@ -232,7 +229,7 @@ def markdown_to_html_node_quote(block):
         childrenList.append(quoteLine)
 
     quoteBlockNodeList = HTMLNode(tag = "quoteblock", value = None, children = childrenList, props = None)
-    quoteBlockParentNode = HTMLNode(tag = MarkdownTypes.QUOTE, children = quoteBlockNodeList)
+    quoteBlockParentNode = ParentNode(tag = MarkdownTypes.QUOTE, children = quoteBlockNodeList)
     
     # print(quoteBlockParentNode)
     # print("QUOTE END\n")
@@ -278,7 +275,7 @@ def markdown_to_html_node_code(block):
     filteredText = block.split("```")
     textnode = TextNode(text = filteredText[1], text_type = TextType.CODE)
     htmlnode = text_node_to_html_node(textnode)
-    parentCodeBlock = HTMLNode(tag = MarkdownTypes.CODE, value = None, children = htmlnode, props = None)
+    parentCodeBlock = ParentNode(tag = MarkdownTypes.CODE, children = htmlnode, props = None)
     
     # print(parentCodeBlock)
     # print("CODE END\n")
@@ -327,7 +324,6 @@ def text_to_children(text):
 
 def markdown_to_html_node(text):
     blocks = markdown_to_blocks(text)
-    parentNode = HTMLNode(tag = "div")
     childNodes = []
     for block in blocks:
         blockType = block_to_block_types(block)
@@ -352,7 +348,7 @@ def markdown_to_html_node(text):
         else:
             raise Exception(f"Wrong block type: {blockType}")
 
-    parentNode.children = childNodes
+    parentNode = ParentNode(tag = "div", children = childNodes)
     return parentNode
 
 # md = """
