@@ -470,13 +470,63 @@ This is `code` with **bold** and *italic* text.
 
     
     def test_markdown_to_html_node_code(self):
-        pass
+        md = """
+```
+def main():
+    print("Hello")
+main()
+```
+"""
 
-    def test_markdown_to_html_node_text_to_children(self):
-        pass
+
+        parentNode = markdown_to_html_node(md)
+
+        assert parentNode.children is not None
+        
+        codeParentNode = parentNode.children[0]
+        codeChildren = codeParentNode.children
+        testValue = """
+def main():
+    print("Hello")
+main()
+"""
+        self.assertEqual(codeChildren.value, testValue, "Should be equal")
+
 
     def test_markdown_to_html_node(self):
-        pass
+        md = """
+# Sample Document
+
+This is a **paragraph** with some *italic* text and a `code` inline. Notice how **bold** and *italic* can combine into **bold word**.
+
+* Unordered list item 1
+* Unordered list item 2
+* Unordered list item 3
+
+1. Ordered list item 1
+2. Ordered list item 2
+3. Ordered list item 3
+4. Ordered list item 4
+
+> This is a blockquote, intended to be emphasized. 
+> 
+> It also includes a list item.
+>
+
+```
+def example_function():
+    print("Hello, World!")
+```
 
 
 
+"""
+
+        parentDivNode = markdown_to_html_node(md)
+
+        assert parentDivNode.children is not None
+        nodes = parentDivNode.children
+
+        # for node in nodes:
+        #     print(f"\n{node}\n")
+        self.assertEqual(len(nodes), 6, "Should be 6")
