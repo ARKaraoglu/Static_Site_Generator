@@ -264,48 +264,15 @@ this is a paragraph
     def test_markdown_to_html_node_heading(self):
         md = """
 # Heading 1
-### Heading 3 with *bold* and `code`
-###### Heading 6 with `code`
 """
-        parentNode = markdown_to_html_node(md)
-        assert parentNode.children is not None
+        divNode = markdown_to_html_node(md)
+        assert divNode.children is not None
+        heading = divNode.children[0]
 
-        self.assertEqual(parentNode.children[0].tag, MarkdownTypes.HEADING, "parent node should be of type heading")
-        headingNode = parentNode.children[0]
-        childrenNodes = headingNode.children
-        self.assertEqual(len(childrenNodes), 3, "3 lines = 3 nodes")
-        # Validate Heading 1
-        h1 = childrenNodes[0]
-        self.assertEqual(h1.tag, "h1", "first line should be of h1 tag")
-        self.assertEqual(len(h1.children), 1, "Should have only 1 children since no inline markdown")
-        # Validate Heading 2
-        h3 = childrenNodes[1]
-        self.assertEqual(h3.tag, "h3", "Second child node should have tag of h3")
-        self.assertEqual(len(h3.children), 4, "Should have 4 because 2 inline markdown is present")
-        self.assertEqual(h3.children[0].tag, None, "Tag should be paragraph")
-        self.assertEqual(h3.children[1].tag, "i", "Tag should be italic")
-        self.assertEqual(h3.children[1].value, "bold", "Value should be bold")
-        self.assertEqual(h3.children[3].tag, "code", "Tag should be code")
-        # Validate Heading 3
-        h6 = childrenNodes[2]
-        self.assertEqual(h6.tag, "h6", "Third child node should have tag of h3")
-        self.assertEqual(len(h6.children), 2, "Should have 2 because 1 inline markdown is present")
-        self.assertEqual(h6.children[0].tag, None, "Should be none for leafnode don't have a tag for paragraph text")
-        self.assertEqual(h6.children[1].tag, "code", "Should be code")
-        self.assertEqual(h6.children[1].value, "code", "Should be saying code")
+        self.assertEqual(heading.tag, "h1", "Should be h1")
+        self.assertEqual(len(heading.children), 1, "Should be 1 since no inline markdown")
 
 
-#     def test_markdown_to_html_node_heading_two(self):
-#         md = """
-# # Heading 1
-# ### Heading 3 with *bold* and `code`
-# Heading without number signs
-# """
-#         nodes = markdown_to_html_node(md)
-#         assert nodes.children is not None
-#         
-#         print(nodes.children[0])
-    
     def test_markdown_to_html_node_paragraph(self):
         md = """
 This is a paragraph
@@ -316,20 +283,17 @@ This is `code` with **bold** and *italic* text.
         self.assertEqual(parentNode.tag, "div", "should be div")
         
         assert parentNode.children is not None
-        paragraphParentNode = parentNode.children[0]
+        paragraph = parentNode.children[0]
         # Validate paragraph parent node
-        self.assertEqual(paragraphParentNode.tag, MarkdownTypes.PARAGRAPH, "Should be paragraph")
+        self.assertEqual(paragraph.tag, "p", "Should be p")
 
-        paragraphChildren = paragraphParentNode.children
-        self.assertEqual(len(paragraphChildren), 2, "Should be 2")
-        # Validate paragraph node 2
-        p1 = paragraphChildren[0]
-        self.assertEqual(len(p1.children), 1, "Should be 1 since no inline markdown")
-        self.assertEqual(p1.tag, "p", "Should be p")
-        # Validate paragraph node 2
-        p2 = paragraphChildren[1]
-        self.assertEqual(len(p2.children), 7, "Should be 7")
-        self.assertEqual(p2.children[1].tag, "code", "Should be code")
+        paragraphChildren = paragraph.children
+        # Validate children node
+        self.assertEqual(len(paragraphChildren), 8, "Should be 8")
+        self.assertEqual(paragraphChildren[2].value, "code", "Should be code")
+        self.assertEqual(paragraphChildren[2].tag, "code", "Should be code")
+        self.assertEqual(paragraphChildren[6].value, "italic", "Should be italic")
+        self.assertEqual(paragraphChildren[6].tag, "i", "Should be italic")
     
     def test_markdown_to_html_node_unordered_list(self):
         md = """
@@ -353,17 +317,14 @@ This is `code` with **bold** and *italic* text.
 *
 * Unordered 7
 """
-        parentNode = markdown_to_html_node(md)
-        parentNode2 = markdown_to_html_node(md2)
+        parentDiv1 = markdown_to_html_node(md)
+        parentDiv2 = markdown_to_html_node(md2)
         
-        assert parentNode.children is not None
-        assert parentNode2.children is not None
+        assert parentDiv1.children is not None
+        assert parentDiv2.children is not None
         
-        unorderedListParent = parentNode.children[0]
-        unorderedListParent2 = parentNode2.children[0]
-        
-        ulNode = unorderedListParent.children
-        ulNode2 = unorderedListParent2.children
+        ulNode = parentDiv1.children[0]
+        ulNode2 = parentDiv2.children[0]
 
         listItems = ulNode.children
         listItems2 = ulNode2.children
@@ -397,6 +358,7 @@ This is `code` with **bold** and *italic* text.
         self.assertEqual(len(listItems2[5].children), 1, "Should be 1 since no inline markdown")
         self.assertEqual(len(listItems2[6].children), 1, "Should be 1 since no inline markdown")
         self.assertEqual(len(listItems2[7].children), 1, "Should be 1 since no inline markdown")
+ 
     def test_markdown_to_html_node_ordered_list(self):
         md = """
 1. Ordered list 1
@@ -408,11 +370,10 @@ This is `code` with **bold** and *italic* text.
 7.
 
 """
-        parentNode = markdown_to_html_node(md)
+        parentDiv = markdown_to_html_node(md)
         
-        assert parentNode.children is not None
-        orderedListNode = parentNode.children[0]
-        olNode = orderedListNode.children
+        assert parentDiv.children is not None
+        olNode = parentDiv.children[0]
         listItems = olNode.children
         
         # Validating olNode
@@ -433,17 +394,17 @@ This is `code` with **bold** and *italic* text.
         self.assertEqual(listItems[2].children[4].value, "3", "Should be 3")
 
         self.assertEqual(len(listItems[3].children), 1, "Should be 1")
-        self.assertEqual(listItems[3].children[0].value, " ", "Should be an empty string")
+        self.assertEqual(listItems[3].children[0].value, "", "Should be an empty string")
 
         self.assertEqual(len(listItems[4].children), 1, "Should be 1")
-        self.assertEqual(listItems[4].children[0].value, " ", "Should be an empty string")
+        self.assertEqual(listItems[4].children[0].value, "", "Should be an empty string")
 
 
         self.assertEqual(len(listItems[5].children), 1, "Should be 1")
-        self.assertEqual(listItems[5].children[0].value, " ", "Should be an empty string")
+        self.assertEqual(listItems[5].children[0].value, "", "Should be an empty string")
         
         self.assertEqual(len(listItems[6].children), 1, "Should be 1")
-        self.assertEqual(listItems[6].children[0].value, " ", "Should be an empty string")
+        self.assertEqual(listItems[6].children[0].value, "", "Should be an empty string")
     
     def test_markdown_to_html_node_quote(self):
         md = """
@@ -455,18 +416,17 @@ This is `code` with **bold** and *italic* text.
 > Quote 5
 >
 """
-        parentNode = markdown_to_html_node(md)
-        assert parentNode.children is not None
-        quoteParentNode = parentNode.children[0]
+        parentDiv = markdown_to_html_node(md)
+        assert parentDiv.children is not None
         
-        quoteNode = quoteParentNode.children
+        quoteNode = parentDiv.children[0]        
         quoteChildren = quoteNode.children
         
         # Validating Quote Items
         self.assertEqual(len(quoteChildren), 7, "Should be 7")
 
         self.assertEqual(len(quoteChildren[2].children), 5, "Should be 5")
-        self.assertEqual(quoteChildren[4].children[0].value, " ", "Should be empty string")
+        self.assertEqual(quoteChildren[4].children[0].value, "", "Should be empty string")
 
     
     def test_markdown_to_html_node_code(self):
@@ -479,18 +439,18 @@ main()
 """
 
 
-        parentNode = markdown_to_html_node(md)
+        parentDiv = markdown_to_html_node(md)
 
-        assert parentNode.children is not None
+        assert parentDiv.children is not None
         
-        codeParentNode = parentNode.children[0]
-        codeChildren = codeParentNode.children
+        codeNode = parentDiv.children[0]
+        codeChildren = codeNode.children
         testValue = """
 def main():
     print("Hello")
 main()
 """
-        self.assertEqual(codeChildren.value, testValue, "Should be equal")
+        self.assertEqual(codeChildren[0].value, testValue, "Should be equal")
 
 
     def test_markdown_to_html_node(self):
@@ -527,6 +487,4 @@ def example_function():
         assert parentDivNode.children is not None
         nodes = parentDivNode.children
 
-        # for node in nodes:
-        #     print(f"\n{node}\n")
         self.assertEqual(len(nodes), 6, "Should be 6")

@@ -1,5 +1,5 @@
 from enum import Enum
-from htmlnode import HTMLNode, LeafNode, ParentNode
+from htmlnode import HTMLNode, ParentNode
 from splitdelimiter import split_nodes_image, split_nodes_link, text_type_delimiters, split_nodes_delimiter
 from textnode import TextType, TextNode, text_node_to_html_node
 import re
@@ -120,121 +120,112 @@ def block_to_block_types(block):
 # NOTE: Returns HTMLNode with tag = header and children = [all heading HTMLNodes with tags as h1...h6 with children that contains all textnodes: text,bold,italic,code,link,image]
 def markdown_to_html_node_heading(block):
     # print("HEADING START\n")
-    headings = block.split("\n")
-    
-    splitHeadings = []
-    for heading in headings:
-        if len(heading) == 1:
-            raise ValueError("Heading cannot be empty")
-        splitHeadings.append(heading.split(" ", 1))
-    
-    childrenHeaderNodes = []
-    for heading in splitHeadings:
-        tag = f"h{heading[0].count('#')}"
-        text = heading[1]
-        header = HTMLNode(tag = tag)
-        # textNode = TextNode(heading[1], TextType.TEXT)
-        
-        childrenNodesList = []
-        childrenNodesList.extend(text_to_children(text))
-        
-        header.children = childrenNodesList
-        childrenHeaderNodes.append(header)
-        
-    parentHeaderNode = ParentNode(tag = MarkdownTypes.HEADING,  children = childrenHeaderNodes, props = None)
+    heading = block
 
-    # print(parentHeaderNode)
+    if len(heading.split("\n")) > 1:
+        splittedHeading = heading.split("\n")
+        raise Exception(f'1 block cannot consist of more than 1 Heading Sentence:\n{splittedHeading}, Length:{len(splittedHeading)}')
+
+    if len(heading) == 1:
+        raise ValueError("Heading cannot be empty")
+    
+    tagTextSplit = heading.split(" ", 1)
+
+    childrenNodesList = []
+    tag = f"h{tagTextSplit[0].count('#')}"
+    text = tagTextSplit[1]
+    childrenNodesList.extend(text_to_children(text))
+    
+    headingParentNode = ParentNode(tag = tag, children = childrenNodesList)
+    return headingParentNode
+    # print(headingParentNode)
     # print("HEADING END\n")
 
-    return parentHeaderNode
 
 def markdown_to_html_node_paragraph(block):
     # print("PARAGRAPH START\n")
     lines = block.split("\n")
 
-    childParagraphNodes = []
+    children = []
     for line in lines:
-        paragraphNode = HTMLNode("p", value = None, children = text_to_children(line), props = None)
-        childParagraphNodes.append(paragraphNode)
+        children.extend(text_to_children(line))
     
-    parentParagraphNode = ParentNode(tag = MarkdownTypes.PARAGRAPH,  children = childParagraphNodes, props = None)
-    # print(parentParagraphNode)
+    paragraphParentNode = ParentNode("p",  children = children, props = None)
+    return paragraphParentNode
+    # print(block)
+    # print(paragraphParentNode)
     # print("PARAGRAPH END\n")
 
-    return parentParagraphNode
     
 def markdown_to_html_node_unordered_list(block):
     # print("UNORDERED LIST START\n")
     lines = block.split("\n")
-    listItemNodes = []
+    listItems = []
 
     for line in lines:
         text = ""
-        # print(f"line:{line}")
-        if len(line) == 1:
-            text = " "
-        else:
+        
+        # If line is not empty!
+        if len(line) > 1:
             text = line.split(" ", 1)[1]
-        # print(text)
+
         nodeChildren = text_to_children(text)
-        node = HTMLNode(tag = "li", value = None, children = nodeChildren, props = None)
-        listItemNodes.append(node)
+        node = ParentNode(tag = "li", children = nodeChildren, props = None)
+        listItems.append(node)
 
-    unorderedList = HTMLNode(tag = "ul", value = None, children = listItemNodes, props = None)
-    unorderedListParentNode = ParentNode(tag = MarkdownTypes.UNORDERED_LIST, children = unorderedList)
-    # print(unorderedListParentNode)
+    uListParentNode = ParentNode(tag = "ul", children = listItems, props = None)
+    return uListParentNode
+    # print(uListParentNode.to_html())
     # print("UNORDERED LIST END\n")
-
-    return unorderedListParentNode
 
 
 def markdown_to_html_node_ordered_list(block):
     # print("ORDERED LIST START\n")
     lines = block.split("\n")
-    listItemNodes = []
+    listItems = []
 
     for line in lines:
         text = ""
-        # print(f"line:{line}")
-        if len(line) == 2:
-            text = " "
-        else:
+        
+        # If line is not empty!
+        if len(line) > 2:
             text = line.split(" ", 1)[1]
+        
         nodeChildren = text_to_children(text)
-        node = HTMLNode(tag = "li", value = None, children = nodeChildren, props = None)
-        listItemNodes.append(node)
+        li = ParentNode(tag = "li", children = nodeChildren, props = None)
+        listItems.append(li)
 
-    orderedList = HTMLNode(tag = "ol", value = None, children = listItemNodes, props = None)
-    orderedListParentNode = HTMLNode(tag = MarkdownTypes.ORDERED_LIST, children = orderedList)
-    # print(orderedListParentNode)
+    oListParentNode = ParentNode(tag = "ol", children = listItems, props = None)
+    return oListParentNode
+    # print(oListParentNode)
     # print("ORDERED LIST END\n")
 
-    return orderedListParentNode
 
     # HTMLNODE -> BLOCKQUOTE -> Inner markdown
 def markdown_to_html_node_quote(block):
     # print("QUOTE START\n")
     lines = block.split("\n")
     
-    childrenList = []
+    quoteItems = []
     for line in lines:
         text = ""
-        # print(f"line:{line}")
-        if len(line) == 1:
-            text = " "
-        else:
+        
+        # Is line is not empty!
+        if len(line) > 1:
             text = line.split(" ", 1)[1]
+        
         children = text_to_children(text)
-        quoteLine = HTMLNode(tag = "p", value = None, children = children, props = None)
-        childrenList.append(quoteLine)
+        if len(lines) == 1:
+            quoteLine = children[0]
+        else:
+            quoteLine = ParentNode(tag = "p", children = children, props = None)
+        quoteItems.append(quoteLine)
 
-    quoteBlockNodeList = HTMLNode(tag = "quoteblock", value = None, children = childrenList, props = None)
-    quoteBlockParentNode = ParentNode(tag = MarkdownTypes.QUOTE, children = quoteBlockNodeList)
-    
-    # print(quoteBlockParentNode)
+    quoteBlockNodeList = ParentNode(tag = "blockquote", children = quoteItems, props = None)
+    return quoteBlockNodeList
+    # print(quoteBlockNodeList)
     # print("QUOTE END\n")
     
-    return quoteBlockParentNode
 
 # def markdown_to_html_node_image(block):
 #     print("IMAGE START\n")
@@ -274,13 +265,13 @@ def markdown_to_html_node_code(block):
     # print("CODE START\n")
     filteredText = block.split("```")
     textnode = TextNode(text = filteredText[1], text_type = TextType.CODE)
-    htmlnode = text_node_to_html_node(textnode)
-    parentCodeBlock = ParentNode(tag = MarkdownTypes.CODE, children = htmlnode, props = None)
+    codenode = text_node_to_html_node(textnode)
+    parentCodeBlock = ParentNode(tag = "pre", children = [codenode], props = None)
     
+    return parentCodeBlock
     # print(parentCodeBlock)
     # print("CODE END\n")
     
-    return parentCodeBlock
 
 def text_to_children(text):
     nodeList = []
@@ -288,8 +279,10 @@ def text_to_children(text):
     linkRegex = r"(?<!!)\[.*?\]\(.*?\)"
     node = TextNode(text, TextType.TEXT)
     nodeList.append(node)
+
     while True:
         bufferList = []
+        delimiterActivated = False
         for node in nodeList:
             if node.text_type != TextType.TEXT:
                 bufferList.append(node)
@@ -297,23 +290,25 @@ def text_to_children(text):
             
             if text_type_delimiters[TextType.BOLD] in node.text:
                 bufferList.extend(split_nodes_delimiter([node], text_type_delimiters[TextType.BOLD], TextType.BOLD))
+                delimiterActivated = True
             elif text_type_delimiters[TextType.ITALIC] in node.text:
                 bufferList.extend(split_nodes_delimiter([node], text_type_delimiters[TextType.ITALIC], TextType.ITALIC))
+                delimiterActivated = True
             elif text_type_delimiters[TextType.CODE] in node.text:
                 bufferList.extend(split_nodes_delimiter([node], text_type_delimiters[TextType.CODE], TextType.CODE))
+                delimiterActivated = True
             elif re.search(imageRegex, node.text):
-                print("Image Regex activated")
                 bufferList.extend(split_nodes_image(node))
+                delimiterActivated = True
             elif re.search(linkRegex, node.text):
-                print("Link Regex activated")
                 bufferList.extend(split_nodes_link(node))
+                delimiterActivated = True
             else:
                 bufferList.append(node)
-        if len(bufferList) == len(nodeList):
+        nodeList.clear()
+        nodeList.extend(bufferList)
+        if delimiterActivated == False:
             break
-        else:
-            nodeList.clear()
-            nodeList.extend(bufferList)
     
     #NOTE:TextNode -> HTMLNode(LeafNode)
     #NOTE:LeafNode = Inline Markdown
@@ -361,30 +356,115 @@ def markdown_to_html_node(text):
 #     print(block_to_block_types(block))
 
 
-# md = """
-# # This is a heading with a *italic* text and a **bold** text.
-# ### this is an h3 heading with `code` text and a **bold text** in it.
-# ##### this is an ![image alt](/) and a [link alt](//).
-#
-# this is a paragraph with **bold** text
-# this is a paragraph with *italic* text
-# and a `code` text.
-#
-# - unordered list 1
-# - unordered **bold** list 2
-# - unordered *italic* list 3
-# - unordered `code` list 4
-#
-# * unordered list 1
-# * unordered list 2
-# * unordered list 3
-# * unordered `code` list 4
-#
-# 1. ordered list 1
-# 2. ordered **bold** list 2
-# 3. ordered *italic* list 3
-# 4. ordered `code` list 4
-# """
+md = """
+# This is a heading with a *italic* text and a **bold** text.
+### this is an h3 heading with `code` text and a **bold text** in it.
+##### this is an ![image alt](/) and a [link alt](//).
+
+this is a paragraph with **bold** text
+this is a paragraph with *italic* text
+and a `code` text.
+
+- unordered list 1
+- unordered **bold** list 2
+- 
+- unordered *italic* list 3
+- unordered `code` list 4
+
+* unordered list 1
+* unordered list 2
+* 
+* 
+* unordered list 3
+* unordered `code` list 4
+
+1. ordered list 1
+2. ordered **bold** list 2
+3. ordered *italic* list 3
+4. ordered `code` list 4
+"""
+
+#   div
+#       [
+#       [heading children = [inline markdown]]
+#       [paragraph]
+#       [ulist]
+#       [olist]
+#       ]
+
+mdHeading = """
+# This is a heading with a *italic* text and a **bold** text.
+"""
+mdHeading2 = """
+# Title
+
+### this is an h3 heading with `code` text and a **bold text** in it.
+
+##### this is an ![image alt](/) and a [link alt](//).
+"""
+
+mdParagraph = """
+this is a paragraph with **bold** text
+this is a paragraph with *italic* text
+and a `code` text.
+"""
+mdUList = """
+- unordered list 1
+- unordered **bold** list 2
+- 
+- unordered *italic* list 3
+- unordered `code` list 4
+
+* unordered list 1
+* unordered list 2
+* 
+* 
+* unordered list 3
+* unordered `code` list 4
+"""
+mdOList = """
+1. ordered list 1
+2. ordered **bold** list 2
+3. ordered *italic* list 3
+4. ordered `code` list 4
+5. 
+6. 
+7.
+8. ordered list 5
+
+"""
+mdQuote = """
+> Quote 1
+> Quote 2 with **bold** text.
+> Quote 3 with *italic* text.
+>
+> Quote with `code` text.
+
+![alt text](/)
+
+[href text](#)
+"""
+
+mdImage = """
+![alt text](/)
+"""
+
+mdCode = """
+```
+{
+  "firstName": "John",
+  "lastName": "Smith",
+  "age": 25
+}
+```
+"""
+
+test = """
+**I like Tolkien**. Read my ![first post here](/majesty) (sorry the link doesn't work yet)
+"""
+# print(markdown_to_html_node(test))
+
+
 # md = """
 # ![Image text](/)
 # ![image two](/)
@@ -394,13 +474,6 @@ def markdown_to_html_node(text):
 # [link two](#)
 # [link three](#)
 #
-# ```
-# {
-#   "firstName": "John",
-#   "lastName": "Smith",
-#   "age": 25
-# }
-# ```
 #
 #
 #

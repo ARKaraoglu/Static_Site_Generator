@@ -13,7 +13,6 @@ text_type_delimiters = {
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
     # print(f"Old Nodes: {old_nodes}")
     newNodes = []
-    
     if text_type_delimiters[text_type] != delimiter:
         raise Exception(f"Delimiter and Text Type do not match: Input({text_type}:{delimiter}) Expected({text_type}:{text_type_delimiters[text_type]})")
 
@@ -124,7 +123,6 @@ def split_nodes_image(old_node):
             url = markdownImages[imagePointer][1]
             newNodes.append(TextNode(altText, TextType.IMAGE, url))
             imagePointer += 1
-
     return newNodes
 
 

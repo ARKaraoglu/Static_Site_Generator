@@ -1,5 +1,5 @@
 import unittest
-from textnode import TextNode, TextType, text_node_to_html_node
+from textnode import TextNode, TextType
 from splitdelimiter import (
         split_nodes_delimiter, 
         extract_markdown_images, 
