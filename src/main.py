@@ -6,7 +6,8 @@ from htmlnode import HTMLNode
 
 def move_content(sourceDir, destinationDir):
     if destinationDir == "public" and os.path.isdir("public"):
-        shutil.rmtree(destinationDir)
+        if sourceDir == "static":
+            shutil.rmtree(destinationDir)
 
     initialFileList = os.listdir(sourceDir)
     
@@ -19,15 +20,14 @@ def move_content(sourceDir, destinationDir):
                 filteredFilePaths.append(f"{sourceDir}/{index}")
             filteredFilePaths.extend(move_content(f"{sourceDir}/{index}",""))
 
-
     if destinationDir == "":
         return filteredFilePaths
     
     for path in filteredFilePaths:
         if os.path.exists(destinationDir) is False:
             os.mkdir(destinationDir)
-
-        fileDest = os.path.join(destinationDir, path.split("static/")[1])
+        print(f"Destination Directory: {path}")
+        fileDest = os.path.join(destinationDir, path.split(f"{sourceDir}/")[1])
 
 
         if os.path.isdir(path):
@@ -71,10 +71,42 @@ def generate_page(from_path, template_path, dest_path):
     with open(f"{dest_path}/index.html", "w") as indexFile:
         indexFile.write(finaltemplatecontent)
 
+def generate_pages_recursively(dir_path_content, template_path, dest_dir_path):
+    filePaths = move_content(dir_path_content, dest_dir_path)
     
+    indexFilePaths = []
+    for file in filePaths:
+        if "index.md" in file:
+            indexFilePaths.append(file)
+    
+    templateFile = open(template_path, "r")
+    templateContent = templateFile.read()
+    
+    for file in indexFilePaths:
+
+
+        sourceFile = open(file, "r")
+        sourceContent = sourceFile.read()
+
+        destFilePath = file.replace("content", "public")
+        
+        # Changes the index.md with index.html
+        newPath = destFilePath.replace(".md", ".html")
+        os.rename(destFilePath, newPath)
+        
+        htmlString = markdown_to_html_node(sourceContent).to_html()
+        title = extract_title(sourceContent)
+        
+        tempContent = templateContent.replace("{{ Title }}", title)
+        destinationContent = tempContent.replace("{{ Content }}", htmlString)
+
+        with open(newPath, "w") as destFile:
+            print(destFile)
+            destFile.write(destinationContent)
+
 def main():
     print(move_content("static", "public"))
-    generate_page("content/index.md", "template.html", "public")
+    generate_pages_recursively("content", "template.html", "public")
 
 if __name__ == "__main__":
     main()
