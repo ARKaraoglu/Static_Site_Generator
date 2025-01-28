@@ -10,8 +10,8 @@ text_type_delimiters = {
     # TextType.IMAGE: "img"
 }
 
+# Recieves a list of nodes and breaks them down to equivalent delimiters. Look up to text_type_delimiters
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
-    # print(f"Old Nodes: {old_nodes}")
     newNodes = []
     if text_type_delimiters[text_type] != delimiter:
         raise Exception(f"Delimiter and Text Type do not match: Input({text_type}:{delimiter}) Expected({text_type}:{text_type_delimiters[text_type]})")
@@ -37,6 +37,7 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
         newNodes.extend(filteredNodes)
     return newNodes
 
+# Extracts markdown images from text
 def extract_markdown_images(text):
     regex = r"!\[.*?\]\(.*?\)"
     
@@ -67,6 +68,7 @@ def extract_markdown_images(text):
         
     return filteredImages
 
+# Extracts markdown links from text.
 def extract_markdown_links(text):
     regex = r"(?<!!)\[.*?\]\(.*?\)"
 
@@ -97,6 +99,7 @@ def extract_markdown_links(text):
     
     return filteredLinks
 
+# Splits a node down to a list of textnodes 1 or multiple of them contains images using extract_markdown_images function
 def split_nodes_image(old_node):
     regex = r"!\[.*?\]\(.*?\)"
     nodeText = old_node.text
@@ -125,7 +128,7 @@ def split_nodes_image(old_node):
             imagePointer += 1
     return newNodes
 
-
+# Splits a node down to a list of textnodes 1 or multiple of them contains links using extract_markdown_links function
 def split_nodes_link(old_node):
     regex = r"(?<!!)\[.*?\]\(.*?\)"
     nodeText = old_node.text
@@ -155,7 +158,7 @@ def split_nodes_link(old_node):
 
     return newNodes
 
-
+# Splits down a text to textnodes using functions above
 def text_to_textnodes(text):
     nodes_split_by_delimiters = []
     tempList = []
@@ -209,13 +212,3 @@ def text_to_textnodes(text):
 
 
 
-# class Main():
-    # pass
-    # node = TextNode("this is a textnode ![markdown image](/)![hey](/) with a markdown image. ![third image](/)", TextType.TEXT)
-    # print(split_nodes_image(node))
-    # nodeTwo = TextNode("This is text with a link ![to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev)",TextType.TEXT)
-    # print(split_nodes_link(nodeTwo))
-    # text_to_textnodes("This is **text** with an *italic* word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)")
-# Main()
-
-            

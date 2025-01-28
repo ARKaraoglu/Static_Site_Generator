@@ -12,9 +12,9 @@ class MarkdownTypes(Enum):
     UNORDERED_LIST = "unordered_list"
     ORDERED_LIST = "ordered_list"
 
+# Breaks down a markdown into blocks
 def markdown_to_blocks(markdown):
     blocks = markdown.split("\n\n")
-    # print(blocks)
     filteredBlocks = []
     for block in blocks:
         if block == "":
@@ -24,16 +24,13 @@ def markdown_to_blocks(markdown):
 
     return filteredBlocks
 
+# Determines the type of markdown block
 def block_to_block_types(block):
     lines = block.split("\n")
     words = []
     for line in lines:
         words.append(line.split(" "))
     
-    # print(lines)
-    # print(words)
-        
-    # print(lines, words)
     # Checking Heading Block
     if "#" in words[0][0]:
         if words[0][0].count("#") > 6:
@@ -77,16 +74,6 @@ def block_to_block_types(block):
             if word[0] != ("*"):
                 return MarkdownTypes.PARAGRAPH.value
         return MarkdownTypes.UNORDERED_LIST.value
-
-    # if "*" in words[0][0] or "-" in words[0][0]:
-    #     for x in range(0, len(lines)):
-    #         if words[x][0] == "*":
-    #             continue
-    #         elif words[x][0] == "-":
-    #             continue
-    #         else:
-    #             return MarkdownTypes.PARAGRAPH.value
-    #     return MarkdownTypes.UNORDERED_LIST.value
 
     # Checking Ordered List Block
     if "1." in words[0][0]:
@@ -138,12 +125,8 @@ def markdown_to_html_node_heading(block):
     
     headingParentNode = ParentNode(tag = tag, children = childrenNodesList)
     return headingParentNode
-    # print(headingParentNode)
-    # print("HEADING END\n")
-
 
 def markdown_to_html_node_paragraph(block):
-    # print("PARAGRAPH START\n")
     lines = block.split("\n")
 
     children = []
@@ -152,13 +135,8 @@ def markdown_to_html_node_paragraph(block):
     
     paragraphParentNode = ParentNode("p",  children = children, props = None)
     return paragraphParentNode
-    # print(block)
-    # print(paragraphParentNode)
-    # print("PARAGRAPH END\n")
-
     
 def markdown_to_html_node_unordered_list(block):
-    # print("UNORDERED LIST START\n")
     lines = block.split("\n")
     listItems = []
 
@@ -175,12 +153,9 @@ def markdown_to_html_node_unordered_list(block):
 
     uListParentNode = ParentNode(tag = "ul", children = listItems, props = None)
     return uListParentNode
-    # print(uListParentNode.to_html())
-    # print("UNORDERED LIST END\n")
 
 
 def markdown_to_html_node_ordered_list(block):
-    # print("ORDERED LIST START\n")
     lines = block.split("\n")
     listItems = []
 
@@ -197,13 +172,10 @@ def markdown_to_html_node_ordered_list(block):
 
     oListParentNode = ParentNode(tag = "ol", children = listItems, props = None)
     return oListParentNode
-    # print(oListParentNode)
-    # print("ORDERED LIST END\n")
 
 
     # HTMLNODE -> BLOCKQUOTE -> Inner markdown
 def markdown_to_html_node_quote(block):
-    # print("QUOTE START\n")
     lines = block.split("\n")
     
     quoteItems = []
@@ -223,56 +195,22 @@ def markdown_to_html_node_quote(block):
 
     quoteBlockNodeList = ParentNode(tag = "blockquote", children = quoteItems, props = None)
     return quoteBlockNodeList
-    # print(quoteBlockNodeList)
-    # print("QUOTE END\n")
     
 
-# def markdown_to_html_node_image(block):
-#     print("IMAGE START\n")
-#     lines = block.split("\n")
-#     parentImageNode = HTMLNode(tag = "image")
-#
-#     imageNodeChildren = []
-#     for line in lines:
-#         imageTextNode = TextNode(text = line, text_type = TextType.TEXT)
-#         textnode = split_nodes_image(imageTextNode)
-#         leafnode = text_node_to_html_node(textnode)
-#         imageNodeChildren.append(leafnode)
-#
-#     parentImageNode.children = imageNodeChildren
-#     print(parentImageNode)
-#     print("IMAGE END\n")
-#
-# def markdown_to_html_node_link(block):
-#     print("LINK START\n")
-#     lines = block.split("\n")
-#     parentLinkNode = HTMLNode(tag = "link")
-#     
-#     linkNodeChildren = []
-#     for line in lines:
-#         linkTextNode = TextNode(text = line, text_type = TextType.TEXT)
-#         textnode = split_nodes_link(linkTextNode)
-#         leafnode = text_node_to_html_node(textnode)
-#         linkNodeChildren.append(leafnode)
-#
-#     parentLinkNode.children = linkNodeChildren
-#     
-#     print(parentLinkNode)
-#     print("LINK END\n")
-#     
 
 def markdown_to_html_node_code(block):
-    # print("CODE START\n")
     filteredText = block.split("```")
     textnode = TextNode(text = filteredText[1], text_type = TextType.CODE)
     codenode = text_node_to_html_node(textnode)
     parentCodeBlock = ParentNode(tag = "pre", children = [codenode], props = None)
     
     return parentCodeBlock
-    # print(parentCodeBlock)
-    # print("CODE END\n")
-    
 
+# Handles inline markdowns like bold italic, code, image and links
+# Args:
+#       text (string): a line of string 
+# Returns:
+#       htmlNodeList (htmlNodeList) = A list consisting of args(text) broken down into leafnodes with different text types according to inline markdown it contains.
 def text_to_children(text):
     nodeList = []
     imageRegex = r"!\[.*?\]\(.*?\)"
@@ -317,6 +255,7 @@ def text_to_children(text):
         htmlnodeList.append(text_node_to_html_node(textnode))
     return htmlnodeList
 
+# Turnes markdown text into htmlnodes(ParentNode / LeafNode)
 def markdown_to_html_node(text):
     blocks = markdown_to_blocks(text)
     childNodes = []
@@ -346,150 +285,3 @@ def markdown_to_html_node(text):
     parentNode = ParentNode(tag = "div", children = childNodes)
     return parentNode
 
-# md = """
-# * Unordered List
-# """
-#
-# blocks = markdown_to_blocks(md)
-#
-# for block in blocks:
-#     print(block_to_block_types(block))
-
-
-md = """
-# This is a heading with a *italic* text and a **bold** text.
-### this is an h3 heading with `code` text and a **bold text** in it.
-##### this is an ![image alt](/) and a [link alt](//).
-
-this is a paragraph with **bold** text
-this is a paragraph with *italic* text
-and a `code` text.
-
-- unordered list 1
-- unordered **bold** list 2
-- 
-- unordered *italic* list 3
-- unordered `code` list 4
-
-* unordered list 1
-* unordered list 2
-* 
-* 
-* unordered list 3
-* unordered `code` list 4
-
-1. ordered list 1
-2. ordered **bold** list 2
-3. ordered *italic* list 3
-4. ordered `code` list 4
-"""
-
-#   div
-#       [
-#       [heading children = [inline markdown]]
-#       [paragraph]
-#       [ulist]
-#       [olist]
-#       ]
-
-mdHeading = """
-# This is a heading with a *italic* text and a **bold** text.
-"""
-mdHeading2 = """
-# Title
-
-### this is an h3 heading with `code` text and a **bold text** in it.
-
-##### this is an ![image alt](/) and a [link alt](//).
-"""
-
-mdParagraph = """
-this is a paragraph with **bold** text
-this is a paragraph with *italic* text
-and a `code` text.
-"""
-mdUList = """
-- unordered list 1
-- unordered **bold** list 2
-- 
-- unordered *italic* list 3
-- unordered `code` list 4
-
-* unordered list 1
-* unordered list 2
-* 
-* 
-* unordered list 3
-* unordered `code` list 4
-"""
-mdOList = """
-1. ordered list 1
-2. ordered **bold** list 2
-3. ordered *italic* list 3
-4. ordered `code` list 4
-5. 
-6. 
-7.
-8. ordered list 5
-
-"""
-mdQuote = """
-> Quote 1
-> Quote 2 with **bold** text.
-> Quote 3 with *italic* text.
->
-> Quote with `code` text.
-
-![alt text](/)
-
-[href text](#)
-"""
-
-mdImage = """
-![alt text](/)
-"""
-
-mdCode = """
-```
-{
-  "firstName": "John",
-  "lastName": "Smith",
-  "age": 25
-}
-```
-"""
-
-test = """
-**I like Tolkien**. Read my ![first post here](/majesty) (sorry the link doesn't work yet)
-"""
-# print(markdown_to_html_node(test))
-
-
-# md = """
-# ![Image text](/)
-# ![image two](/)
-# ![image three](/)
-#
-# [link one](/)
-# [link two](#)
-# [link three](#)
-#
-#
-#
-#
-#
-#
-# """
-#
-#
-# md = """
-# - Unordered 1
-# - Unordered 2 with **bold**
-# - Unordered 3 with *italic*
-# - Unordered 4 with  `code`
-# - Unordered 5
-# - Unordered 6
-# -
-# - Unordered 7
-# """
-# print(markdown_to_html_node(md))

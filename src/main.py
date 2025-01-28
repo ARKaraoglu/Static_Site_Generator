@@ -52,25 +52,6 @@ def extract_title(markdown):
         raise Exception("No Title found!")
     return h1.split(" ", 1)[1]
 
-def generate_page(from_path, template_path, dest_path):
-    print(f"Generating page from {from_path} to {dest_path} using {template_path}\n")
-
-    file = open(from_path, "r")
-    contents = file.read()
-    
-    title = extract_title(contents) 
-    
-    htmlString = markdown_to_html_node(contents).to_html()
-
-    template = open(template_path, "r")
-    templateContent = template.read()
-
-    tempContent = templateContent.replace("{{ Title }}", title)
-    finaltemplatecontent = tempContent.replace("{{ Content }}", htmlString)
-
-    with open(f"{dest_path}/index.html", "w") as indexFile:
-        indexFile.write(finaltemplatecontent)
-
 def generate_pages_recursively(dir_path_content, template_path, dest_dir_path):
     filePaths = move_content(dir_path_content, dest_dir_path)
     
